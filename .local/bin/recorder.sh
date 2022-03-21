@@ -15,6 +15,6 @@ if [ $(pgrep ffmpeg) ]
 	then
 		pkill -x ffmpeg
 	else
-		ffmpeg -f x11grab -i :0.0 "$filename"
+		ffmpeg -f x11grab -i :0.0 -f pulse -i default -c:v libx264 -r 30 -pix_fmt yuv420p "$filename"
 fi
 
