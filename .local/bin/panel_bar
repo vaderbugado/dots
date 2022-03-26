@@ -8,6 +8,10 @@ num_mon=$(bspc query -M | wc -l)
 
 while read -r line ; do
 	case $line in
+		C*)
+			# cpu usage
+			CPU="%{F$COLOR_CYAN}%{B$COLOR_DEFAULT_BG} ${line#?} %{B-}%{F-}"
+			;;
 		R*)
 			# hostname
 			root="%{F$COLOR_DEFAULT_FG}%{B$COLOR_DEFAULT_BG} ${line#?} %{B-}%{F-}"
@@ -130,5 +134,5 @@ while read -r line ; do
 			done
 			;;
 	esac
-	printf "%s\n" "%{l}${wm}${TITLE}%{r}|${root}|${home}|${HOST}|${PKGS}|${SYS}"
+	printf "%s\n" "%{l}${wm}${TITLE}%{r}${CPU}${SYS}"
 done

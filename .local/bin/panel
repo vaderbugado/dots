@@ -13,23 +13,26 @@ mkfifo "$PANEL_FIFO"
 xtitle -sf 'T%s\n' > "$PANEL_FIFO" &
 ##############################################################3
 while :; do
-DATE=$(date +'📅 %d/%m/%y ⏰ %H:%M')
+DATE=$(date +'%a %d/%m/%y %H:%M')
 PKGS=$(xbps-query -l | wc -l)
 home=$(df -H /home | awk 'END{print $3 "/" $2}')
 root=$(df -H / | awk 'END{print $3 "/" $2}')
-printf "%s\n" "S$DATE" "P📦 $PKGS" "D💿home: $home" "R💿root: $root"
+printf "%s\n" "S$DATE"
 sleep 60
-done > "$PANEL_FIFO" & 
-##############################################################3
-printf "%s\n" "H@$(hostname)" > "$PANEL_FIFO" &
-##############################################################3
+done > $PANEL_FIFO & 
+while true; do
+CPU=$(echo $((100-$(vmstat 1 2|tail -1|awk '{print $15}'))))
+printf "%s\n" "C$CPU%"
+sleep 2
+done > $PANEL_FIFO &
+#printf "%s\n" "H@$(hostname)" > "$PANEL_FIFO" &
 
 
 bspc subscribe report > "$PANEL_FIFO" &
 
 . panel_colors
 
-panel_bar < "$PANEL_FIFO" | lemonbar -a 32 -u 2 -n "$PANEL_WM_NAME" -g x$PANEL_HEIGHT -f "Hack-11" -f "JoyPixels-10" -F "$COLOR_DEFAULT_FG" -B "$COLOR_DEFAULT_BG" | sh &
+panel_bar < "$PANEL_FIFO" | lemonbar -a 32 -u 2 -n "$PANEL_WM_NAME" -g x$PANEL_HEIGHT -f "Hack:pixelsize=11" -F "$COLOR_DEFAULT_FG" -B "$COLOR_DEFAULT_BG" | sh &
 
 wid=$(xdo id -m -a "$PANEL_WM_NAME")
 xdo above -t "$(xdo id -N Bspwm -n root | sort | head -n 1)" "$wid"
