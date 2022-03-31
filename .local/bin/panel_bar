@@ -8,6 +8,10 @@ num_mon=$(bspc query -M | wc -l)
 
 while read -r line ; do
 	case $line in
+		c*)
+			# cpu usage
+			CLIMA="%{F$COLOR_DEFAULT_FG}%{B$COLOR_DEFAULT_BG} ${line#?} %{B-}%{F-}"
+			;;
 		C*)
 			# cpu usage
 			CPU="%{F$COLOR_CYAN}%{B$COLOR_DEFAULT_BG} ${line#?} %{B-}%{F-}"
@@ -134,5 +138,5 @@ while read -r line ; do
 			done
 			;;
 	esac
-	printf "%s\n" "%{l}${wm}${TITLE}%{r}${CPU}${SYS}"
+	printf "%s\n" "%{l}${wm}${TITLE}%{r}${CLIMA}${CPU}${SYS}"
 done

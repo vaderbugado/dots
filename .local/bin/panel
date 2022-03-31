@@ -1,38 +1,37 @@
 #! /bin/sh
 
-if xdo id -a "$PANEL_WM_NAME" > /dev/null ; then
-	printf "%s\n" "The panel is already running." >&2
-	exit 1
-fi
-
+[xdo id -a "$PANEL_WM_NAME" > /dev/null] && printf "%s\n" "The panel is already running." >&2	exit 1
 trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
 
-[ -e "$PANEL_FIFO" ] && rm "$PANEL_FIFO"
-mkfifo "$PANEL_FIFO"
-##############################################################3
-xtitle -sf 'T%s\n' > "$PANEL_FIFO" &
-##############################################################3
-while :; do
+[ -e "$PANEL_FIFO" ] && rm "$PANEL_FIFO" ; mkfifo "$PANEL_FIFO"
+
+
+# Módulos:
+xtitle -sf 'T%s\n' > "$PANEL_FIFO" # xtitle
+
+while :; do # módulos 60s
 DATE=$(date +'%a %d/%m/%y %H:%M')
 PKGS=$(xbps-query -l | wc -l)
 home=$(df -H /home | awk 'END{print $3 "/" $2}')
 root=$(df -H / | awk 'END{print $3 "/" $2}')
-printf "%s\n" "S$DATE"
+CLIMA=$(curl wttr.in/mariana?format="%c%t\n" | sed 's/ //g')
+printf "%s\n" "S$DATE" "c$CLIMA"
 sleep 60
 done > $PANEL_FIFO & 
-while true; do
+
+while true; do # múdolos 2s
 CPU=$(echo $((100-$(vmstat 1 2|tail -1|awk '{print $15}'))))
 printf "%s\n" "C$CPU%"
 sleep 2
 done > $PANEL_FIFO &
-#printf "%s\n" "H@$(hostname)" > "$PANEL_FIFO" &
+printf "%s\n" "H@$(hostname)" > "$PANEL_FIFO" &
 
 
-bspc subscribe report > "$PANEL_FIFO" &
+bspc subscribe report > "$PANEL_FIFO" & # bspwm
 
-. panel_colors
+. panel_colors 
 
-panel_bar < "$PANEL_FIFO" | lemonbar -a 32 -u 2 -n "$PANEL_WM_NAME" -g x$PANEL_HEIGHT -f "Hack:pixelsize=11" -F "$COLOR_DEFAULT_FG" -B "$COLOR_DEFAULT_BG" | sh &
+panel_bar < "$PANEL_FIFO" | lemonbar -a 32 -u 2 -n "$PANEL_WM_NAME" -g x$PANEL_HEIGHT -f "Hack-10" -f "JoyPixels:pixelsize=10:antialias=true:autogint=true" -F "$COLOR_DEFAULT_FG" -B "$COLOR_DEFAULT_BG" | sh &
 
 wid=$(xdo id -m -a "$PANEL_WM_NAME")
 xdo above -t "$(xdo id -N Bspwm -n root | sort | head -n 1)" "$wid"

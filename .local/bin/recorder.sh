@@ -11,10 +11,21 @@ if [ -f /home/vader/media/video/recorder/record.mp4 ]
 		filename="/home/vader/media/video/recorder/record.mp4"
 fi
 
-if [ $(pgrep ffmpeg) ] 
+if [ $(pactl info) ] 
 	then
-		pkill -x ffmpeg
+		if [ $(pgrep ffmpeg) ] 
+			then
+				pkill -x ffmpeg
+			else
+				ffmpeg -f x11grab -i :0.0 -f pulse -i default -c:v libx264 -r 30 -pix_fmt yuv420p "$filename"
+		fi
 	else
-		ffmpeg -f x11grab -i :0.0 -f pulse -i default -c:v libx264 -r 30 -pix_fmt yuv420p "$filename"
+		if [ $(pgrep ffmpeg) ] 
+			then
+				pkill -x ffmpeg
+			else
+				ffmpeg -f x11grab -i :0.0 -c:v libx264 -r 30 -pix_fmt yuv420p "$filename"
+		fi
 fi
+
 
