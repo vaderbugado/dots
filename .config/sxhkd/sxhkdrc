@@ -7,18 +7,23 @@ super + u
 Print
 	scrot -q 100 -e 'xclip -selection clipboard -t image/png -i $f' ~/media/img/scrot/.png
 alt + Print
-	scrot -q 100 -s -e 'xclip -selection clipboard -t image/png -i $f' ~/media/img/scrot/.png
+	scrot -q 100 -s -f -e 'xclip -selection clipboard -t image/png -i $f' ~/media/img/scrot/.png
 # apps
-alt + o; {w,s,k,m,g,b,l}
-	{vieb,steam,keepassxc,st -c ncpamixer ncpamixer,gimp,st btop,st lf}
+alt + o; {w,s,k,M,m,g,b,l}
+	{vieb,steam,keepassxc,st -c alsamixer alsamixer,st -c ncpamixer -e ncpamixer,gimp,st -c btop btop,st lfub}
+alt + s; {c,r}
+	{st -c clima -g 125x42 -e clima.sh,recorder.sh}
+
 # terminal emulator
 super + @space
 	st
 
 # program launcher
 super + d
-	dmenu_run
+	dmenu_run -z 200 -l 49 -y 12 -bw 2
 
+alt + d; {k,e}
+	{  [ -e /tmp/keepassxc-dmenu/run ] && echo y > /tmp/keepassxc-dmenu/run || keepassxc-dmenu >/dev/null 2>&1,dmenu-emoji.sh}
 # make sxhkd reload its configuration files:
 super + Escape
 	pkill -USR1 -x sxhkd
@@ -127,4 +132,4 @@ super + alt + shift + {h,j,k,l}
 
 # move a floating window
 alt + {h,j,k,l}
-	bspc node -v {-20 0,0 20,0 -20,20 0}
+	bspc node -v {-40 0,0 40,0 -40,40 0}
